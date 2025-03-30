@@ -433,7 +433,7 @@ export default function PrashnavaliPage() {
                 
                 <div className="mb-6">
                   <div className="bg-sacred-gold bg-opacity-10 rounded-lg p-4">
-                    <h3 className="text-sacred-gold font-medium mb-2">Your Divine Oracle Settings:</h3>
+                    <h3 className="text-sacred-gold font-medium mb-2">Your Prashnavali Settings:</h3>
                     <ul className="text-himalayan-white text-opacity-80 space-y-1 text-sm">
                       <li className="flex items-center">
                         <span className="mr-2">📚</span>
@@ -567,7 +567,7 @@ export default function PrashnavaliPage() {
                       </div>
                       
                       <blockquote className="border-l-4 border-sacred-gold pl-4 italic text-ashram-gray mb-4">
-                        &quot{response.quote}&quot
+                        {response.quote}
                       </blockquote>
                       
                       <AnimatePresence>
