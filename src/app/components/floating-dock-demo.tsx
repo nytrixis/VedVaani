@@ -27,7 +27,7 @@ export default function FloatingDockDemo() {
       icon: (
         <IconQuestionMark className="h-full w-full text-himalayan-white" />
       ),
-      href: "/prashnavali",
+      href: "/features/prashnavali",
     },
     {
       title: "AI Guru",
