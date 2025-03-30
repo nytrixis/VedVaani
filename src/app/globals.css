@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --mystic-indigo: #3D348B;
+  --deep-teal: #086375;
+  --tranquil-sky-blue: #7CAFC4;
+  --sacred-gold: #F7B801;
+  --deep-saffron: #F18701;
+  --himalayan-white: #F5F5F5;
+  --ashram-gray: #6B7280;
+  --celestial-purple: #7B2CBF;
+  --lotus-pink: #E63946;
+  --glowing-cyan: #00B4D8;
+}
+
+body {
+  color: var(--ashram-gray);
+  background-color: var(--himalayan-white);
+}
+
+@font-face {
+  font-family: 'Samarkan';
+  src: url('/fonts/SAMARN__.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer utilities {
+  .font-samarkan {
+    font-family: 'Samarkan', serif;
+  }
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair), Georgia, serif;
+  }
+}
+
+@layer components {
+  .font-playfair {
+    font-family: var(--font-playfair), Georgia, serif;
+  }
+  
+  .bg-gradient-divine {
+    background: linear-gradient(135deg, var(--mystic-indigo), var(--deep-teal));
+  }
+  
+  .bg-gradient-button {
+    background: radial-gradient(circle, var(--deep-saffron), var(--lotus-pink));
+  }
+  
+  .text-shadow-divine {
+    text-shadow: 0 0 10px rgba(247, 184, 1, 0.5);
+  }
+  
+  .shadow-divine-glow {
+    box-shadow: 0 0 15px rgba(247, 184, 1, 0.3);
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* Add this to your globals.css */
+@keyframes aurora {
+  0% {
+    background-position: 50% 50%, 50% 50%;
+  }
+  50% {
+    background-position: 0% 100%, 100% 0%;
+  }
+  100% {
+    background-position: 50% 50%, 50% 50%;
+  }
+}
+
+.after\:animate-aurora::after {
+  animation: aurora 15s linear infinite;
+}
+
+/* Add this to your existing globals.css file */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 0.5rem));
+  }
+}
+
+.animate-scroll {
+  animation: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
+}
+
+}
