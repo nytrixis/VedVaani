@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import AuroraBackgroundDemo from '@/app/components/aurora-background-demo'
 
-import { motion, useScroll, useInView } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 
 import DashboardShowcase from '@/app/components/dashboard-showcase'
 import InfiniteMovingCardsDemo from '@/app/components/infinite-moving-cards-demo'
