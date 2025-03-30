@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/app/context/AuthContext'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card } from '@/app/components/ui/Card'
 import { Button } from '@/app/components/ui/Button'

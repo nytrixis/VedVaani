@@ -3,21 +3,17 @@
 import { useRef } from 'react'
 import AuroraBackgroundDemo from '@/app/components/aurora-background-demo'
 
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
+import { motion, useScroll, useInView } from 'framer-motion'
 
 import DashboardShowcase from '@/app/components/dashboard-showcase'
 import InfiniteMovingCardsDemo from '@/app/components/infinite-moving-cards-demo'
 export default function Home() {
   // Refs for scroll animations
-  const featuresRef = useRef(null)
   const testimonialsRef = useRef(null)
-  const ctaRef = useRef(null)
   
   // Check if sections are in view
   const testimonialsInView = useInView(testimonialsRef, { once: false, amount: 0.2 })
   
-  // Scroll animations
-  const { scrollYProgress } = useScroll()
   
   return (
     <div className="flex flex-col items-center">

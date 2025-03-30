@@ -543,7 +543,7 @@ const featureScreens = [
                 <div>
                   <p className="text-sm text-himalayan-white font-bold mb-1">Spiritual Insight</p>
                   <p className="text-sm text-himalayan-white">
-                    Your practice shows deepening awareness of the sakshi bhava (witness consciousness) described in Advaita Vedanta. Consider exploring the Mandukya Upanishad's teachings on the four states of consciousness to further enhance your meditation.
+                    Your practice shows deepening awareness of the sakshi bhava (witness consciousness) described in Advaita Vedanta. Consider exploring the Mandukya Upanishad teachings on the four states of consciousness to further enhance your meditation.
                   </p>
                 </div>
               </div>

@@ -566,7 +566,7 @@ export default function PrashnavaliPage() {
                       </div>
                       
                       <blockquote className="border-l-4 border-sacred-gold pl-4 italic text-ashram-gray mb-4">
-                        "{response.quote}"
+                        &quot{response.quote}&quot
                       </blockquote>
                       
                       <AnimatePresence>
