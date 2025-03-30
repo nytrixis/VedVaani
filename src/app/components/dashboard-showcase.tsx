@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/Button";
-import { Card } from "@/app/components/ui/Card";
 import { cn } from "@/app/lib/utils";
 import { 
   IconArrowLeft, 
@@ -134,7 +133,7 @@ const featureScreens = [
                   <li>Liberation from suffering (dukkha)</li>
                   <li>Attainment of inner peace and equanimity</li>
                 </ul>
-                <p className="mt-2">The Yoga Sutras of Patanjali describe meditation as the path to "chitta vritti nirodha" - stilling the fluctuations of consciousness.</p>
+                <p className="mt-2">The Yoga Sutras of Patanjali describe meditation as the path to chitta vritti nirodha - stilling the fluctuations of consciousness.</p>
               </div>
             </div>
           </div>
@@ -194,7 +193,7 @@ const featureScreens = [
                 <span className="text-sacred-gold text-xs">You</span>
               </div>
               <div className="bg-mystic-indigo bg-opacity-50 rounded-lg p-3 text-sm text-himalayan-white">
-                I've been struggling with anger lately. What spiritual practice would you recommend?
+                I have been struggling with anger lately. What spiritual practice would you recommend?
               </div>
             </div>
             
@@ -203,9 +202,9 @@ const featureScreens = [
                 <span className="text-himalayan-white text-xs">Guru</span>
               </div>
               <div className="bg-celestial-purple bg-opacity-40 rounded-lg p-3 text-sm text-himalayan-white">
-                <p>I notice you've been working on patience in our recent sessions. For anger specifically, I recommend:</p>
+                <p>I notice you have been working on patience in our recent sessions. For anger specifically, I recommend:</p>
                 <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li>The "Cooling Breath" (Sheetali Pranayama) - 5 minutes daily</li>
+                  <li>The Cooling Breath (Sheetali Pranayama) - 5 minutes daily</li>
                   <li>Chapter 2 of the Bhagavad Gita on equanimity</li>
                   <li>The loving-kindness (Metta) meditation we practiced last week</li>
                 </ul>
@@ -521,7 +520,7 @@ const featureScreens = [
             
             <div className="flex-grow bg-mystic-indigo bg-opacity-30 rounded-lg p-4 border border-sacred-gold border-opacity-20 overflow-y-auto">
               <p className="text-himalayan-white mb-4">
-                Today's meditation was particularly deep. I focused on the mantra "Om Namah Shivaya" for 20 minutes and experienced a profound sense of peace. The visualization of light flowing through my body helped me release tension in my shoulders and neck.
+                Meditation today was particularly deep. I focused on the mantra Om Namah Shivaya for 20 minutes and experienced a profound sense of peace. The visualization of light flowing through my body helped me release tension in my shoulders and neck.
               </p>
               <p className="text-himalayan-white mb-4">
                 Key insights:
@@ -529,7 +528,7 @@ const featureScreens = [
               <ul className="list-disc pl-5 mb-4 text-himalayan-white space-y-1">
                 <li>The connection between breath and thought became very clear</li>
                 <li>When I let go of expectations, the meditation deepened naturally</li>
-                <li>The concept of "witnessing consciousness" made practical sense today</li>
+                <li>The concept of witnessing consciousness made practical sense today</li>
               </ul>
               <p className="text-himalayan-white">
                 Tomorrow I want to explore the heart-centered meditation technique from the Upanishads that Guru Ananda suggested.
@@ -544,7 +543,7 @@ const featureScreens = [
                 <div>
                   <p className="text-sm text-himalayan-white font-bold mb-1">Spiritual Insight</p>
                   <p className="text-sm text-himalayan-white">
-                    Your practice shows deepening awareness of the "sakshi bhava" (witness consciousness) described in Advaita Vedanta. Consider exploring the Mandukya Upanishad's teachings on the four states of consciousness to further enhance your meditation.
+                    Your practice shows deepening awareness of the sakshi bhava (witness consciousness) described in Advaita Vedanta. Consider exploring the Mandukya Upanishad's teachings on the four states of consciousness to further enhance your meditation.
                   </p>
                 </div>
               </div>
@@ -780,7 +779,7 @@ export default function DashboardShowcase() {
       
       {/* Feature Indicators - dots below the MacBook */}
       <div className="flex justify-center mt-8 space-x-2">
-        {featureScreens.map((feature, index) => (
+        {featureScreens.map((feature) => (
           <button
             key={feature.id}
             className={`w-3 h-3 rounded-full transition-colors ${

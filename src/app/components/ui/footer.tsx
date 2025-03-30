@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import { cn } from "@/app/lib/utils";
+
 
 // Social media icons
 const SocialIcon = ({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) => (

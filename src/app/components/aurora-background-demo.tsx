@@ -5,19 +5,9 @@ import React from "react";
 import { AuroraBackground } from "@/app/components/ui/aurora-background";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/Button";
-import Image from "next/image";
 
-// SVG Components for decorative elements
-const OmSymbol = () => (
-  <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-20">
-    <path d="M50 10C27.9086 10 10 27.9086 10 50C10 72.0914 27.9086 90 50 90C72.0914 90 90 72.0914 90 50C90 27.9086 72.0914 10 50 10Z" stroke="currentColor" strokeWidth="2"/>
-    <path d="M50 25C45 25 40 30 40 35C40 40 45 45 50 45C55 45 60 40 60 35C60 30 55 25 50 25Z" stroke="currentColor" strokeWidth="2"/>
-    <path d="M50 45V65" stroke="currentColor" strokeWidth="2"/>
-    <path d="M40 65H60" stroke="currentColor" strokeWidth="2"/>
-    <path d="M35 55C30 60 30 70 35 75" stroke="currentColor" strokeWidth="2"/>
-    <path d="M65 55C70 60 70 70 65 75" stroke="currentColor" strokeWidth="2"/>
-  </svg>
-)
+
+
 
 export default function AuroraBackgroundDemo() {
   return (

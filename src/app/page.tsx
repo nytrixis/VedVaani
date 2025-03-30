@@ -1,12 +1,10 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import AuroraBackgroundDemo from '@/app/components/aurora-background-demo'
-import Link from 'next/link'
-import Image from 'next/image'
+
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { Button } from '@/app/components/ui/Button'
-import { Card } from '@/app/components/ui/Card'
+
 import DashboardShowcase from '@/app/components/dashboard-showcase'
 import InfiniteMovingCardsDemo from '@/app/components/infinite-moving-cards-demo'
 export default function Home() {
@@ -16,14 +14,10 @@ export default function Home() {
   const ctaRef = useRef(null)
   
   // Check if sections are in view
-  const featuresInView = useInView(featuresRef, { once: false, amount: 0.2 })
   const testimonialsInView = useInView(testimonialsRef, { once: false, amount: 0.2 })
-  const ctaInView = useInView(ctaRef, { once: false, amount: 0.2 })
   
   // Scroll animations
   const { scrollYProgress } = useScroll()
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
-  const y = useTransform(scrollYProgress, [0, 0.2], [0, -50])
   
   return (
     <div className="flex flex-col items-center">

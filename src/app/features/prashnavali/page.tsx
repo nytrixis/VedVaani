@@ -2,10 +2,8 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import { Button } from "@/app/components/ui/Button";
 import { Card } from "@/app/components/ui/Card";
-import { AuroraBackground } from "@/app/components/ui/aurora-background";
 
 // Scripture options
 const scriptureOptions = [
