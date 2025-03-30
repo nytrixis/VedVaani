@@ -64,6 +64,7 @@ export default function PrashnavaliPage() {
   
   // State for API response
   const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   
