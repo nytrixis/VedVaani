@@ -10,6 +10,8 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
+  const baseUrl = 'https://vedvaani.vercel.app'
+
   // Check if the request is for a protected route
   const isProtectedRoute = req.nextUrl.pathname.startsWith('/dashboard') ||
                           req.nextUrl.pathname.startsWith('/features') ||
@@ -27,7 +29,7 @@ export async function middleware(req: NextRequest) {
   // If accessing a protected route without being logged in, redirect to login
   if (isProtectedRoute && !session) {
     // Save the original URL the user was trying to access
-    const redirectUrl = new URL('/login', req.url)
+    const redirectUrl = new URL('/login', baseUrl)
     redirectUrl.searchParams.set('redirectedFrom', req.nextUrl.pathname)
     return NextResponse.redirect(redirectUrl)
   }
@@ -38,10 +40,10 @@ export async function middleware(req: NextRequest) {
     const redirectedFrom = req.nextUrl.searchParams.get('redirectedFrom')
     if (redirectedFrom) {
       // Redirect to the original URL the user was trying to access
-      return NextResponse.redirect(new URL(redirectedFrom, req.url))
+      return NextResponse.redirect(new URL(redirectedFrom, baseUrl))
     }
     // Otherwise, redirect to dashboard
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+    return NextResponse.redirect(new URL('/dashboard', baseUrl))
   }
 
   return res
