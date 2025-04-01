@@ -30,8 +30,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Initialize Magic Link
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const magic = new Magic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY as string)
-      setMagic(magic)
+      try {
+        const magic = new Magic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY as string)
+        setMagic(magic)
+      } catch (error) {
+        console.error("Failed to initialize Magic:", error);
+        // Even if Magic fails to initialize, we should still set loading to false
+        setLoading(false);
+      }
     }
   }, [])
 
@@ -40,12 +46,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check for user session on initial load
     const getSession = async () => {
       try {
+        console.log("AuthContext: Fetching session...");
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Error getting session:', error);
           setUser(null);
         } else if (data?.session?.user) {
+          console.log("AuthContext: Session found, user exists");
           const supabaseUser = data.session.user;
           
           // Check if user exists in our users table
@@ -191,6 +199,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     }
   }
+
+  console.log("AuthContext: Current state - loading:", loading, "user:", user ? "exists" : "null");
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, updateProfile }}>

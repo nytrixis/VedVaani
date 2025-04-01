@@ -3,8 +3,9 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { AuthProvider } from './context/AuthContext'
 import FloatingDockDemo from './components/floating-dock-demo'
-import { Footer } from './components/ui/footer'
+import ClientFooter from './components/ClientFooter'
 import { Toaster } from 'sonner'
+
 // Font setup
 const inter = Inter({ 
   subsets: ['latin'],
@@ -32,12 +33,16 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.variable} ${playfair.variable} font-sans min-h-screen bg-himalayan-white`}>
         <AuthProvider>
-          {children}
-          <Toaster position="top-center" />
-          <FloatingDockDemo />
-          <Footer />
+          <div className="flex flex-col min-h-screen">
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Toaster position="top-center" />
+            <FloatingDockDemo />
+            <ClientFooter />
+          </div>
         </AuthProvider>
       </body>
     </html>
-  )
+  );
 }
