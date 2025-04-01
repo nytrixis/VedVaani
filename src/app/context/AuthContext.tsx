@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [magic, setMagic] = useState<Magic | null>(null)
+  const [setMagic] = useState<Magic | null>(null)
 
   // Initialize Magic Link
   useEffect(() => {

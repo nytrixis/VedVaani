@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
     }
     
     const data = await groqResponse.json();
-    let responseText = data.choices[0].message.content;
+    const responseText = data.choices[0].message.content;
     
     // Translate the response back to the requested language if it's not English
     // if (language !== 'en') {
