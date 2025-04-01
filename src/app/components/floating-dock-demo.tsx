@@ -2,6 +2,7 @@
 
 import React from "react";
 import { FloatingDock } from "@/app/components/ui/floating-dock";
+import { useAuth } from "@/app/context/AuthContext";
 import {
   IconHome,
   IconQuestionMark,
@@ -14,13 +15,14 @@ import {
 
 
 export default function FloatingDockDemo() {
+  const { user } = useAuth();
   const links = [
     {
       title: "Home",
       icon: (
         <IconHome className="h-full w-full text-himalayan-white" />
       ),
-      href: "/",
+      href: user ? "/dashboard" : "/",
     },
     {
       title: "Prashnavali",
