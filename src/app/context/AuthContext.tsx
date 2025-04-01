@@ -15,7 +15,7 @@ type User = {
 type AuthContextType = {
   user: User | null
   loading: boolean
-  login: (email: string) => Promise<void>
+  login: (email: string) => Promise<boolean>
   logout: () => Promise<void>
   updateProfile: (data: Partial<User>) => Promise<void>
 }
@@ -37,106 +37,130 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check for existing session
   useEffect(() => {
-    async function loadUser() {
+    // Check for user session on initial load
+    const getSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data, error } = await supabase.auth.getSession();
         
-        if (session?.user) {
-          // Get user profile from our users table
-          const { data: profile } = await supabase
+        if (error) {
+          console.error('Error getting session:', error);
+          setUser(null);
+        } else if (data?.session?.user) {
+          const supabaseUser = data.session.user;
+          
+          // Check if user exists in our users table
+          const { data: existingUser, error: userError } = await supabase
             .from('users')
             .select('*')
-            .eq('id', session.user.id)
-            .single()
+            .eq('id', supabaseUser.id)
+            .single();
           
-          if (profile) {
-            setUser({
-              id: session.user.id,
-              email: session.user.email!,
-              full_name: profile.full_name,
-              avatar_url: profile.avatar_url,
-              spiritual_path: profile.spiritual_path,
-            })
-          } else {
-            // User exists in auth but not in our users table
-            setUser({
-              id: session.user.id,
-              email: session.user.email!,
-            })
+          if (!existingUser && !userError) {
+            // Create new user profile
+            await supabase.from('users').insert({
+              id: supabaseUser.id,
+              email: supabaseUser.email,
+            });
           }
+          
+          // Set user in state
+          setUser({
+            id: supabaseUser.id,
+            email: supabaseUser.email!,
+            full_name: existingUser?.full_name,
+            avatar_url: existingUser?.avatar_url,
+            spiritual_path: existingUser?.spiritual_path,
+          });
+        } else {
+          setUser(null);
         }
       } catch (error) {
-        console.error('Error loading user:', error)
+        console.error('Session check error:', error);
+        setUser(null);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-
-    loadUser()
-  }, [])
+    };
+  
+    getSession();
+  
+    // Set up auth state listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          const supabaseUser = session.user;
+          
+          // Check if user exists in our users table
+          const { data: existingUser, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', supabaseUser.id)
+            .single();
+          
+          if (!existingUser && !userError) {
+            // Create new user profile
+            await supabase.from('users').insert({
+              id: supabaseUser.id,
+              email: supabaseUser.email,
+            });
+          }
+          
+          // Set user in state
+          setUser({
+            id: supabaseUser.id,
+            email: supabaseUser.email!,
+            full_name: existingUser?.full_name,
+            avatar_url: existingUser?.avatar_url,
+            spiritual_path: existingUser?.spiritual_path,
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+  
+    return () => {
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
+    };
+  }, []);
+  
 
   // Login with Magic Link
   const login = async (email: string) => {
     try {
-      setLoading(true)
-      
-      if (!magic) throw new Error('Magic not initialized')
-      
-      // Get DID token with Magic Link
-      const didToken = await magic.auth.loginWithMagicLink({ email })
-      
-      if (!didToken) throw new Error('Failed to get DID token')
-      
-      // Exchange DID token for Supabase session
-      const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: 'magic',
-        token: didToken as string,
-      })
-      
-      if (error) throw error
-      
-      if (data.user) {
-        // Check if user exists in our users table
-        const { data: existingUser, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', data.user.id)
-          .single()
-        
-        if (!existingUser && !userError) {
-          // Create new user profile
-          await supabase.from('users').insert({
-            id: data.user.id,
-            email: data.user.email,
-          })
-        }
-        
-        // Set user in state
-        setUser({
-          id: data.user.id,
-          email: data.user.email!,
-          full_name: existingUser?.full_name,
-          avatar_url: existingUser?.avatar_url,
-          spiritual_path: existingUser?.spiritual_path,
-        })
-      }
+      setLoading(true);
+  
+      // Use Supabase's built-in magic link functionality
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+  
+      if (error) throw error;
+  
+      // Return true to indicate success
+      return true;
     } catch (error) {
-      console.error('Login error:', error)
-      throw error
+      console.error('Login error:', error);
+      throw error;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+  
   // Logout
   const logout = async () => {
     try {
       setLoading(true)
       
-      if (magic) {
-        await magic.user.logout()
-      }
-      
-      await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) throw error;
       setUser(null)
     } catch (error) {
       console.error('Logout error:', error)
