@@ -4,6 +4,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/Button";
 import { Card } from "@/app/components/ui/Card";
+import html2canvas from 'html2canvas';
+import { Share2, BookmarkPlus, Copy, Download, Volume } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/app/lib/supabase";
+
 
 // Scripture options
 const scriptureOptions = [
@@ -67,6 +72,9 @@ export default function PrashnavaliPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const [relatedQuestions, setRelatedQuestions] = useState<string[]>([]);
+    const [isReading, setIsReading] = useState(false);
   
   // UI state
   const [showExplanation, setShowExplanation] = useState(true);
@@ -76,6 +84,7 @@ export default function PrashnavaliPage() {
   // Refs
   const questionInputRef = useRef<HTMLTextAreaElement>(null);
   const responseRef = useRef<HTMLDivElement>(null);
+  
   
   // Focus the question input when reaching step 4
   useEffect(() => {
@@ -90,6 +99,14 @@ export default function PrashnavaliPage() {
       responseRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [response]);
+
+  // Add with your other useEffect hooks
+    useEffect(() => {
+    if (response) {
+        generateRelatedQuestions();
+        }
+    }, [response]);
+  
   
   // Handle scripture selection
   const toggleScripture = (scriptureId: string) => {
@@ -112,6 +129,42 @@ export default function PrashnavaliPage() {
       }
     }
   };
+
+  // Add this function to handle submission with current settings
+const handleSubmitWithCurrentSettings = async (newQuestion: string) => {
+    try {
+      setError("");
+      setIsLoading(true);
+      
+      const response = await fetch('/api/prashnavali', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: newQuestion,
+          scriptures: selectedScriptures,
+          level: selectedLevel,
+          language: selectedLanguage,
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to get response');
+      }
+  
+      const data = await response.json();
+      setResponse(data);
+      setStep(5); // Go directly to the response step
+    } catch (error) {
+      console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   
   // Handle language selection
   const handleLanguageChange = (languageId: string) => {
@@ -164,6 +217,9 @@ export default function PrashnavaliPage() {
                 return scripture ? scripture.name : id;
               });
           
+          // Get the language name for the prompt
+          const languageName = languageOptions.find(l => l.id === selectedLanguage)?.name || "English";
+    
           const response = await fetch('/api/prashnavali', {
             method: 'POST',
             headers: {
@@ -174,6 +230,7 @@ export default function PrashnavaliPage() {
               scriptures: scriptureNames,
               level: selectedLevel,
               language: selectedLanguage,
+              languageName: languageName
             }),
           });
           
@@ -503,7 +560,209 @@ export default function PrashnavaliPage() {
           </motion.div>
         );
         
-      case 5:
+        case 5: // Response display step
+      return (
+        <motion.div
+          key="step5"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.5 }}
+          className="bg-mystic-indigo bg-opacity-30 backdrop-blur-sm rounded-lg p-8"
+        >
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-16 h-16 border-4 border-sacred-gold border-t-transparent rounded-full animate-spin"></div>
+              <p className="mt-4 text-himalayan-white text-lg">Seeking divine wisdom...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-lotus-pink text-lg mb-4">{error}</p>
+              <Button 
+                variant="outline" 
+                onClick={() => setStep(1)}
+                className="border-sacred-gold text-himalayan-white hover:bg-sacred-gold hover:text-mystic-indigo"
+              >
+                Try Again
+              </Button>
+            </div>
+          ) : response ? (
+            <>
+              {/* Response container with ref */}
+              <div ref={responseRef} className="bg-mystic-indigo p-6 rounded-lg shadow-divine-glow">
+                <h2 className="text-2xl font-playfair text-sacred-gold mb-6">Divine Wisdom</h2>
+                
+                <blockquote className="border-l-4 border-sacred-gold pl-4 italic text-himalayan-white mb-4">
+                {response.structured?.quote || response.quote || "Divine wisdom"}
+                </blockquote>
+                
+                <p className="text-tranquil-sky-blue mb-2">
+                    Source: {response.structured?.source || response.source || "Ancient Scripture"}
+                    {(response.structured?.chapter && response.structured?.verse) && 
+                        ` ${response.structured.chapter}:${response.structured.verse}`
+                    }
+                </p>
+                
+                {/* Explanation Section with Toggle */}
+                <div className="mt-6 mb-4 border-b border-sacred-gold border-opacity-30 pb-4">
+                    <div 
+                    className="flex justify-between items-center cursor-pointer" 
+                    onClick={() => setShowExplanation(!showExplanation)}
+                    >
+                    <h3 className="text-xl text-sacred-gold">Meaning</h3>
+                    <button className="text-himalayan-white">
+                        {showExplanation ? '▼' : '►'}
+                    </button>
+                    </div>
+                    
+                    {showExplanation && (
+                    <p className="text-himalayan-white mt-2">
+                        {response.structured?.explanation || response.explanation || ""}
+                    </p>
+                    )}
+                </div>
+    
+                {/* Application Section with Toggle */}
+            <div className="mt-6 mb-4 border-b border-sacred-gold border-opacity-30 pb-4">
+                <div 
+                className="flex justify-between items-center cursor-pointer" 
+                onClick={() => setShowApplication(!showApplication)}
+                >
+                <h3 className="text-xl text-sacred-gold">Application</h3>
+                <button className="text-himalayan-white">
+                    {showApplication ? '▼' : '►'}
+                </button>
+                </div>
+                
+                {showApplication && (
+                <p className="text-himalayan-white mt-2">
+                    {response.structured?.application || response.application || ""}
+                </p>
+                )}
+            </div>
+                
+                {/* Meditation Section with Toggle */}
+            <div className="mt-6">
+                <div 
+                className="flex justify-between items-center cursor-pointer" 
+                onClick={() => setShowMeditation(!showMeditation)}
+                >
+                <h3 className="text-xl text-sacred-gold">Meditation</h3>
+                <button className="text-himalayan-white">
+                    {showMeditation ? '▼' : '►'}
+                </button>
+                </div>
+                
+                {showMeditation && (
+                <p className="text-himalayan-white mt-2">
+                    {response.structured?.meditation || response.meditation || ""}
+                </p>
+                )}
+            </div>
+            </div>
+                        
+              {/* Action buttons */}
+              <div className="mt-8 flex flex-wrap gap-4 justify-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex flex-wrap gap-2 justify-center"
+                >
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-2 bg-himalayan-white bg-opacity-10 text-himalayan-white"
+                    onClick={handleCopyToClipboard}
+                  >
+                    <Copy size={16} />
+                    Copy
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-2 bg-himalayan-white bg-opacity-10 text-himalayan-white"
+                    onClick={handleShareResponse}
+                  >
+                    <Share2 size={16} />
+                    Share
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-2 bg-himalayan-white bg-opacity-10 text-himalayan-white"
+                    onClick={handleSaveToJournal}
+                  >
+                    <BookmarkPlus size={16} />
+                    Save to Journal
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-2 bg-himalayan-white bg-opacity-10 text-himalayan-white"
+                    onClick={handleReadAloud}
+                  >
+                    <Volume size={16} />
+                    {isReading ? "Stop" : "Read Aloud"}
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-2 bg-himalayan-white bg-opacity-10 text-himalayan-white"
+                    onClick={handleDownloadImage}
+                  >
+                    <Download size={16} />
+                    Save Image
+                  </Button>
+                </motion.div>
+              </div>
+              
+              {/* Related questions */}
+              {relatedQuestions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="mt-12 bg-mystic-indigo bg-opacity-30 backdrop-blur-sm rounded-lg p-8 shadow-divine-glow border border-sacred-gold border-opacity-40">
+                  <h3 className="text-xl text-himalayan-white font-playfair mb-6 text-center">Continue Your Spiritual Journey</h3>
+                  <div className="flex flex-col gap-4">
+                    {relatedQuestions.map((q, i) => (
+                      <Button
+                        key={i}
+                        variant="outline"
+                        className="text-left justify-start w-full p-4 bg-himalayan-white bg-opacity-10 text-himalayan-white hover:bg-sacred-gold hover:text-mystic-indigo border-sacred-gold border-opacity-30 shadow-sm hover:shadow-divine-glow transition-all duration-300"
+                        onClick={() => {
+                          setQuestion(q);
+                          setIsLoading(true);
+                        handleSubmitWithCurrentSettings(q);
+                        }}
+                      >
+                        <span className="mr-2 text-sacred-gold">•</span>{q}
+                      </Button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+              
+              <div className="mt-8 text-center">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setStep(1)}
+                  className="border-sacred-gold text-himalayan-white hover:bg-sacred-gold hover:text-mystic-indigo"
+                >
+                  Ask Another Question
+                </Button>
+              </div>
+            </>
+          ) : null}
+        </motion.div>
+      );
+      
+    //   case 6:
         return (
           <motion.div
             key="divine-response"
@@ -795,6 +1054,292 @@ export default function PrashnavaliPage() {
           </div>
         );
       };
+
+    // For copying to clipboard
+    const handleCopyToClipboard = () => {
+      if (!response) {
+        toast.error("No wisdom to copy yet");
+        return;
+      }
+      
+      try {
+        // Log the response to see its structure
+        console.log("Response in copy function:", response);
+        
+        // Safely extract data with multiple fallbacks
+        let quote = "";
+        let source = "Ancient Scripture";
+        let chapter = "";
+        let verse = "";
+        let explanation = "";
+        let application = "";
+        let meditation = "";
+        
+        // Try different possible structures
+        if (typeof response === 'object') {
+          // If response has structured property
+          if (response.structured) {
+            quote = response.structured.quote || "";
+            source = response.structured.source || "Ancient Scripture";
+            chapter = response.structured.chapter || "";
+            verse = response.structured.verse || "";
+            explanation = response.structured.explanation || "";
+            application = response.structured.application || "";
+            meditation = response.structured.meditation || "";
+          } 
+          // If response has direct properties
+          else {
+            quote = response.quote || "";
+            source = response.source || "Ancient Scripture";
+            chapter = response.chapter || "";
+            verse = response.verse || "";
+            explanation = response.explanation || "";
+            application = response.application || "";
+            meditation = response.meditation || "";
+          }
+        } 
+        // If response is a string (unlikely but possible)
+        else if (typeof response === 'string') {
+          quote = response;
+        }
+        
+        // Build the text to copy
+        let textToCopy = `"${quote}"\n`;
+        textToCopy += `- ${source}`;
+        
+        if (chapter && verse) {
+          textToCopy += ` ${chapter}:${verse}`;
+        }
+        
+        textToCopy += "\n\n";
+        
+        if (explanation) {
+          textToCopy += `${explanation}\n\n`;
+        }
+        
+        if (application) {
+          textToCopy += `Application: ${application}\n\n`;
+        }
+        
+        if (meditation) {
+          textToCopy += `Meditation: ${meditation}\n\n`;
+        }
+        
+        textToCopy += "Generated by VedVaani Prashnavali";
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(textToCopy);
+        toast.success("Divine wisdom copied to clipboard");
+      } catch (error) {
+        console.error("Error copying to clipboard:", error);
+        toast.error("Failed to copy to clipboard");
+      }
+    };
+    
+  
+  // For sharing
+  // For sharing
+const handleShareResponse = () => {
+  if (!response) {
+    toast.error("No wisdom to share yet");
+    return;
+  }
+  
+  try {
+    // Extract data safely (similar to copy function)
+    let quote = "";
+    let source = "Ancient Scripture";
+    
+    if (typeof response === 'object') {
+      if (response.structured) {
+        quote = response.structured.quote || "";
+        source = response.structured.source || "Ancient Scripture";
+      } else {
+        quote = response.quote || "";
+        source = response.source || "Ancient Scripture";
+      }
+    } else if (typeof response === 'string') {
+      quote = response;
+    }
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Divine Wisdom from VedVaani',
+        text: `"${quote}" - ${source}`,
+        url: window.location.href,
+      })
+      .then(() => toast.success("Shared successfully"))
+      .catch((error) => toast.error("Error sharing: " + error));
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      handleCopyToClipboard();
+      toast.success("Link copied! You can now share it manually");
+    }
+  } catch (error) {
+    console.error("Error sharing:", error);
+    toast.error("Failed to share wisdom");
+  }
+};
+
+// For reading aloud
+const handleReadAloud = () => {
+  if (!response) {
+    toast.error("No wisdom to read yet");
+    return;
+  }
+  
+  try {
+    if (isReading) {
+      window.speechSynthesis.cancel();
+      setIsReading(false);
+      return;
+    }
+    
+    // Extract data safely (similar to copy function)
+    let quote = "";
+    let source = "Ancient Scripture";
+    let explanation = "";
+    let application = "";
+    let meditation = "";
+    
+    if (typeof response === 'object') {
+      if (response.structured) {
+        quote = response.structured.quote || "";
+        source = response.structured.source || "Ancient Scripture";
+        explanation = response.structured.explanation || "";
+        application = response.structured.application || "";
+        meditation = response.structured.meditation || "";
+      } else {
+        quote = response.quote || "";
+        source = response.source || "Ancient Scripture";
+        explanation = response.explanation || "";
+        application = response.application || "";
+        meditation = response.meditation || "";
+      }
+    } else if (typeof response === 'string') {
+      quote = response;
+    }
+    
+    const textToRead = `
+      ${quote}
+      From ${source}.
+      ${explanation}
+      ${application ? `Application: ${application}` : ""}
+      ${meditation ? `Meditation: ${meditation}` : ""}
+    `;
+    
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.rate = 0.9; // Slightly slower for spiritual content
+    utterance.pitch = 1;
+    utterance.onend = () => setIsReading(false);
+    
+    setIsReading(true);
+    window.speechSynthesis.speak(utterance);
+  } catch (error) {
+    console.error("Error reading aloud:", error);
+    toast.error("Failed to read wisdom aloud");
+    setIsReading(false);
+  }
+};
+
+  
+  // For saving to journal
+  const handleSaveToJournal = async () => {
+    if (!response) return;
+    
+    try {
+      // Check if user is logged in
+      const user = await supabase.auth.getUser();
+      
+      if (!user.data.user) {
+        toast.error("Please log in to save to your journal");
+        // Optionally redirect to login
+        // router.push('/login?redirect=/features/prashnavali');
+        return;
+      }
+      
+      // Save to journal table in Supabase
+      const { error } = await supabase.from('journal_entries').insert({
+        user_id: user.data.user.id,
+        title: `Prashnavali: ${question}`,
+        content: JSON.stringify(response),
+        type: 'prashnavali',
+        tags: selectedScriptures,
+        created_at: new Date().toISOString()
+      });
+      
+      if (error) {
+        console.error("Error saving to journal:", error);
+        toast.error("Failed to save to journal");
+        return;
+      }
+      
+      toast.success("Saved to your spiritual journal");
+    } catch (error) {
+      console.error("Error in save to journal:", error);
+      toast.error("An error occurred while saving");
+    }
+  };
+  
+  const handleDownloadImage = async () => {
+    if (!responseRef.current || !response) return;
+    
+    try {
+      const element = responseRef.current;
+      const canvas = await html2canvas(element, {
+        backgroundColor: '#3D348B', // Mystic indigo background
+        scale: 2, // Higher quality
+      });
+      
+      const image = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `vedvaani-wisdom-${Date.now()}.png`;
+      link.click();
+      
+      toast.success("Divine wisdom image downloaded");
+    } catch (error) {
+      console.error("Error generating image:", error);
+      toast.error("Failed to generate image");
+    }
+  };
+
+
+
+  const generateRelatedQuestions = async () => {
+    if (!response || !question) return;
+    
+    try {
+      const prompt = `
+        Based on the original question: "${question}" 
+        and the response about ${selectedScriptures.join(', ')},
+        generate 3 related follow-up questions that the user might be interested in.
+        Return only the questions as a JSON array of strings, nothing else.
+      `;
+      
+      const groqResponse = await fetch('/api/generate-related', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      
+      if (!groqResponse.ok) {
+        throw new Error('Failed to generate related questions');
+      }
+      
+      const data = await groqResponse.json();
+      setRelatedQuestions(data.questions);
+    } catch (error) {
+      console.error("Error generating related questions:", error);
+      // Fallback to static questions if needed
+      setRelatedQuestions([
+        "How can I apply this wisdom in difficult situations?",
+        "What does this teaching say about personal growth?",
+        "How does this relate to modern spiritual practice?"
+      ]);
+    }
+  };
+
       
       return (
         <div className="flex flex-col">

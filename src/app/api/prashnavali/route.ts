@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { translateText, fallbackTranslate } from '@/app/lib/translate';
 
 // Helper function to create a prompt based on user selections
-function createPrompt(question: string, scriptures: string[], level: string) {
+function createPrompt(question: string, scriptures: string[], level: string, language: string) {
   const scriptureContext = scriptures.join(", ");
   
   let levelContext = "";
@@ -19,6 +19,29 @@ function createPrompt(question: string, scriptures: string[], level: string) {
     default:
       levelContext = "I am seeking spiritual guidance. Please provide balanced insights.";
   }
+
+  let languageName = "English";
+  switch (language) {
+    case "hi": languageName = "Hindi"; break;
+    case "sa": languageName = "Sanskrit"; break;
+    case "bn": languageName = "Bengali"; break;
+    case "ta": languageName = "Tamil"; break;
+    case "te": languageName = "Telugu"; break;
+    case "mr": languageName = "Marathi"; break;
+    case "gu": languageName = "Gujarati"; break;
+    case "kn": languageName = "Kannada"; break;
+    case "ml": languageName = "Malayalam"; break;
+    case "pa": languageName = "Punjabi"; break;
+    case "ne": languageName = "Nepali"; break;
+    case "si": languageName = "Sinhala"; break;
+    case "en": languageName = "English"; break;
+    // Add more languages as needed
+  }
+
+  const languageInstruction = language === 'en' 
+  ? "Please respond in English." 
+  : `Please respond in ${languageName} language. The entire response including the quote, explanation, application, and meditation should be in ${languageName}.`;
+
   
   return `
     I am seeking spiritual guidance from the following scriptures: ${scriptureContext}.
@@ -27,16 +50,32 @@ function createPrompt(question: string, scriptures: string[], level: string) {
     
     My question is: ${question}
     
-    Please structure your response in the following format:
-    1. A direct quote or verse from one of the selected scriptures that addresses my question
-    2. The source of the quote (scripture name, chapter, verse if applicable)
-    3. A clear explanation of the meaning
-    4. How I can apply this wisdom in my daily life
-    5. A short meditation or reflection practice related to this teaching
+    ${languageInstruction}
     
-    Please ensure the response is authentic to the spiritual traditions represented in the selected scriptures, remove any asterisks or special characters, and avoid any unnecessary formatting.
+    Please structure your response as follows:
+
+    1. Begin with a direct quote or verse from one of the selected scriptures that addresses my question. Present this as a complete quotation in quotation marks.
+    
+    2. Provide the source of the quote (scripture name, chapter, verse if applicable) on a new line after the quote.
+    
+    3. Explanation: Write a clear explanation of the meaning in 2-3 short, complete paragraphs. Avoid bullet points, numbered lists, or asterisks. Make sure each paragraph flows naturally and contains complete thoughts.
+    
+    4. Application: Begin this section with "Application:" and then provide 1-2 concise paragraphs about how I can apply this wisdom in my daily life. Ensure these are complete paragraphs with full sentences, not fragmented points. Do not use bullet points or asterisks.
+    
+    5. Meditation: Begin this section with "Meditation:" and then describe a short meditation or reflection practice in 1 complete paragraph. This should be a cohesive paragraph with clear instructions, not a list of steps.
+    
+    Important formatting guidelines:
+    - Do not use asterisks (*), bullet points, or numbered lists anywhere in your response
+    - Write in complete sentences and well-formed paragraphs
+    - Keep paragraphs concise (3-5 sentences each)
+    - Ensure each section flows naturally and doesn't start abruptly
+    - Use simple formatting with clear section breaks
+    - Do not use markdown formatting
+    
+    Please ensure the response is authentic to the spiritual traditions represented in the selected scriptures.
   `;
 }
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,7 +106,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Create the prompt for Groq
-    const prompt = createPrompt(translatedQuestion, scriptures, level);
+    const prompt = createPrompt(translatedQuestion, scriptures, level, language);
     
     // Call Groq API
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -100,20 +139,20 @@ export async function POST(request: NextRequest) {
     let responseText = data.choices[0].message.content;
     
     // Translate the response back to the requested language if it's not English
-    if (language !== 'en') {
-      try {
-        responseText = await translateText(responseText, language);
-      } catch (error) {
-        console.error('Error translating response:', error);
-        // Try fallback translation
-        try {
-          responseText = await fallbackTranslate(responseText, language);
-        } catch (fallbackError) {
-          console.error('Fallback translation also failed:', fallbackError);
-          // Continue with original response if both translation attempts fail
-        }
-      }
-    }
+    // if (language !== 'en') {
+    //   try {
+    //     responseText = await translateText(responseText, language);
+    //   } catch (error) {
+    //     console.error('Error translating response:', error);
+    //     // Try fallback translation
+    //     try {
+    //       responseText = await fallbackTranslate(responseText, language);
+    //     } catch (fallbackError) {
+    //       console.error('Fallback translation also failed:', fallbackError);
+    //       // Continue with original response if both translation attempts fail
+    //     }
+    //   }
+    // }
     
     // Parse the response to extract structured data
     const parsedResponse = parseGrokResponse(responseText);
