@@ -141,12 +141,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string) => {
     try {
       setLoading(true);
+
+      const baseUrl = 'https://vedvaani.vercel.app';
   
       // Use Supabase's built-in magic link functionality
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${baseUrl}/dashboard`,
         },
       });
   
