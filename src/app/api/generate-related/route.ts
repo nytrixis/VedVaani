@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
     
     const data = await groqResponse.json();
-    let responseText = data.choices[0].message.content;
+    const responseText = data.choices[0].message.content;
     
     // Parse the JSON array from the response
     let questions = [];

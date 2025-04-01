@@ -15,8 +15,6 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import Image from "next/image";
-import { cn } from "@/app/lib/utils";
 import { useAuth } from "@/app/context/AuthContext";
 
 export default function DashboardSidebar({ children }: { children: React.ReactNode }) {

@@ -12,7 +12,7 @@ export default function NotFound() {
           Page Not Found
         </h2>
         <p className="text-himalayan-white mb-8">
-          Bhule bhatke vats, let's go home.
+          Bhule bhatke vats, let us go home.
         </p>
         <Link href="/">
           <Button variant="divine" size="lg" className="shadow-divine-glow">

@@ -6,7 +6,6 @@ import DashboardSidebar from '@/app/components/DashboardSidebar';
 import { AuroraBackground } from '@/app/components/ui/aurora-background';
 import { Card } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import FeatureCard from '@/app/components/FeatureCard';
 import { Footer } from '@/app/components/ui/footer';
@@ -179,7 +178,7 @@ function DashboardContent() {
               </svg>
               
               <p className="text-himalayan-white text-lg md:text-xl italic mb-4">
-                "The mind is everything. What you think you become."
+                -The mind is everything. What you think you become.
               </p>
               
               <p className="text-sacred-gold text-sm">
